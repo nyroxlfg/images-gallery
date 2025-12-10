@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000/api';
+// ИСПРАВЛЕНО: Убираем localhost, используем относительные пути
+const API_URL = '/api'; // Только относительный путь!
 let images = [];
 let displayedImages = [];
 
@@ -11,7 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Загрузка изображений
 async function loadImages() {
     try {
+        // ИСПРАВЛЕНО: Используем относительный путь
         const response = await fetch(`${API_URL}/images`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         
         if (data.success) {
@@ -22,7 +27,7 @@ async function loadImages() {
         }
     } catch (error) {
         console.error('Ошибка загрузки:', error);
-        showError('Сервер не отвечает. Запусти server.js');
+        showError('Сервер не отвечает. Проверьте подключение или попробуйте позже.');
     }
 }
 
@@ -30,15 +35,17 @@ async function loadImages() {
 function displayImages(imagesToShow) {
     const gallery = document.getElementById('gallery');
     
+    if (!gallery) return;
+    
     if (imagesToShow.length === 0) {
-        gallery.innerHTML = '<p class="empty">Нет фотографий</p>';
+        gallery.innerHTML = '<p class="empty">Нет фотографий. Загрузите первую!</p>';
         return;
     }
     
     gallery.innerHTML = imagesToShow.map(image => `
         <div class="image-card" onclick="showImageDetail(${image.id})">
             <img src="/uploads/${image.filename}" alt="${image.title}" 
-                 onerror="this.src='https://via.placeholder.com/400x300?text=Фото+не+найдено'">
+                 onerror="this.src='https://via.placeholder.com/400x300?text=Фото+не+найдно'">
             <div class="image-info">
                 <h3>${image.title}</h3>
                 <p>${image.description}</p>
@@ -60,15 +67,21 @@ function displayImages(imagesToShow) {
 // Показать детали
 async function showImageDetail(id) {
     try {
+        // ИСПРАВЛЕНО: Относительный путь
         const response = await fetch(`${API_URL}/images/${id}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
         const data = await response.json();
         
         if (data.success) {
             const image = data.data;
             const modalBody = document.getElementById('modalBody');
             
+            if (!modalBody) return;
+            
             modalBody.innerHTML = `
-                <img src="/uploads/${image.filename}" class="modal-image" alt="${image.title}">
+                <img src="/uploads/${image.filename}" class="modal-image" alt="${image.title}"
+                     onerror="this.src='https://via.placeholder.com/600x400?text=Фото+не+загружено'">
                 <div class="modal-details">
                     <h2>${image.title}</h2>
                     <p>${image.description}</p>
@@ -77,7 +90,7 @@ async function showImageDetail(id) {
                             <span>${image.likes}</span> лайков
                         </div>
                         <div>
-                            <span>${image.comments.length}</span> комментариев
+                            <span>${image.comments ? image.comments.length : 0}</span> комментариев
                         </div>
                         <div>
                             <span>${image.views}</span> просмотров
@@ -92,12 +105,12 @@ async function showImageDetail(id) {
                         </button>
                     </div>
                     <div class="comments">
-                        <h3>Комментарии (${image.comments.length})</h3>
-                        ${image.comments.map(comment => `
+                        <h3>Комментарии (${image.comments ? image.comments.length : 0})</h3>
+                        ${image.comments ? image.comments.map(comment => `
                             <div class="comment">
-                                <strong>${comment.user}</strong>: ${comment.text}
+                                <strong>${comment.user || 'Аноним'}</strong>: ${comment.text}
                             </div>
-                        `).join('')}
+                        `).join('') : '<p>Нет комментариев</p>'}
                         <div class="add-comment">
                             <input type="text" id="commentUser" placeholder="Ваше имя">
                             <textarea id="commentText" placeholder="Ваш комментарий"></textarea>
@@ -107,10 +120,14 @@ async function showImageDetail(id) {
                 </div>
             `;
             
-            document.getElementById('imageModal').style.display = 'block';
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('Ошибка загрузки деталей:', error);
+        alert('Не удалось загрузить детали фото');
     }
 }
 
@@ -119,9 +136,13 @@ async function likeImage(event, id) {
     if (event) event.stopPropagation();
     
     try {
+        // ИСПРАВЛЕНО: Относительный путь
         const response = await fetch(`${API_URL}/images/${id}/like`, {
             method: 'POST'
         });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
         const data = await response.json();
         
         if (data.success) {
@@ -129,6 +150,7 @@ async function likeImage(event, id) {
         }
     } catch (error) {
         console.error('Ошибка лайка:', error);
+        alert('Не удалось поставить лайк');
     }
 }
 
@@ -137,69 +159,97 @@ async function toggleFavorite(event, id) {
     if (event) event.stopPropagation();
     
     try {
+        // ИСПРАВЛЕНО: Относительный путь
         const response = await fetch(`${API_URL}/images/${id}/favorite`, {
             method: 'POST'
         });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
         const data = await response.json();
         
         if (data.success) {
             await loadImages();
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('Ошибка избранного:', error);
+        alert('Не удалось добавить в избранное');
     }
 }
 
 // Комментарий
 async function addComment(id) {
-    const user = document.getElementById('commentUser').value;
-    const text = document.getElementById('commentText').value;
+    const user = document.getElementById('commentUser')?.value || 'Аноним';
+    const text = document.getElementById('commentText')?.value;
     
-    if (!user || !text) return;
+    if (!text || text.trim() === '') {
+        alert('Введите комментарий');
+        return;
+    }
     
     try {
+        // ИСПРАВЛЕНО: Относительный путь
         const response = await fetch(`${API_URL}/images/${id}/comment`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ user, text })
+            body: JSON.stringify({ user, text: text.trim() })
         });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const data = await response.json();
         
         if (data.success) {
+            // Очищаем поля
+            if (document.getElementById('commentUser')) document.getElementById('commentUser').value = '';
+            if (document.getElementById('commentText')) document.getElementById('commentText').value = '';
+            
             showImageDetail(id); // Обновляем модальное окно
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('Ошибка комментария:', error);
+        alert('Не удалось отправить комментарий');
     }
 }
 
 // Загрузка категорий
 async function loadCategories() {
     try {
+        // ИСПРАВЛЕНО: Относительный путь
         const response = await fetch(`${API_URL}/categories`);
+        
+        if (!response.ok) return; // Если нет категорий - пропускаем
+        
         const data = await response.json();
         
         if (data.success) {
             const select = document.getElementById('categoryFilter');
-            data.data.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                select.appendChild(option);
-            });
+            if (select) {
+                data.data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    select.appendChild(option);
+                });
+            }
         }
     } catch (error) {
         console.error('Ошибка категорий:', error);
+        // Игнорируем ошибку категорий, они не критичны
     }
 }
 
 // Поиск
 function searchImages() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const category = document.getElementById('categoryFilter').value;
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categoryFilter');
+    
+    if (!searchInput || !categorySelect) return;
+    
+    const search = searchInput.value.toLowerCase();
+    const category = categorySelect.value;
     
     let filtered = images;
     
@@ -209,8 +259,8 @@ function searchImages() {
     
     if (search) {
         filtered = filtered.filter(img => 
-            img.title.toLowerCase().includes(search) || 
-            img.description.toLowerCase().includes(search)
+            (img.title && img.title.toLowerCase().includes(search)) || 
+            (img.description && img.description.toLowerCase().includes(search))
         );
     }
     
@@ -226,29 +276,41 @@ function showFavorites() {
 
 // Обновление статистики
 function updateStats() {
-    const totalLikes = images.reduce((sum, img) => sum + img.likes, 0);
+    const totalLikes = images.reduce((sum, img) => sum + (img.likes || 0), 0);
     const favoritesCount = images.filter(img => img.isFavorite).length;
     
-    document.getElementById('totalImages').textContent = images.length;
-    document.getElementById('totalLikes').textContent = totalLikes;
-    document.getElementById('favoritesCount').textContent = favoritesCount;
+    const totalImagesEl = document.getElementById('totalImages');
+    const totalLikesEl = document.getElementById('totalLikes');
+    const favoritesCountEl = document.getElementById('favoritesCount');
+    
+    if (totalImagesEl) totalImagesEl.textContent = images.length;
+    if (totalLikesEl) totalLikesEl.textContent = totalLikes;
+    if (favoritesCountEl) favoritesCountEl.textContent = favoritesCount;
 }
 
 // Закрыть модальное окно
 function closeModal() {
-    document.getElementById('imageModal').style.display = 'none';
-    loadImages(); // Обновляем данные
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.display = 'none';
+        loadImages(); // Обновляем данные
+    }
 }
 
 // Ошибка
 function showError(message) {
     const gallery = document.getElementById('gallery');
+    if (!gallery) return;
+    
     gallery.innerHTML = `
         <div class="error">
             <p>${message}</p>
-            <p>1. Установи Node.js</p>
-            <p>2. В папке проекта выполни: npm install</p>
-            <p>3. Запусти: node server.js</p>
+            <div class="error-steps">
+                <p>Если запускаете локально:</p>
+                <p>1. Установи Node.js</p>
+                <p>2. В папке проекта выполни: npm install</p>
+                <p>3. Запусти: node server.js</p>
+            </div>
         </div>
     `;
 }
@@ -260,3 +322,13 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+
+// Экспортируем функции в глобальную область видимости
+window.loadImages = loadImages;
+window.showImageDetail = showImageDetail;
+window.likeImage = likeImage;
+window.toggleFavorite = toggleFavorite;
+window.addComment = addComment;
+window.searchImages = searchImages;
+window.showFavorites = showFavorites;
+window.closeModal = closeModal;
