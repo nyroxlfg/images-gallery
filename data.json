@@ -1,0 +1,119 @@
+[
+  {
+    "id": 1,
+    "title": "Мое первое фото",
+    "description": "Это моя первая фотография в галерее",
+    "filename": "photo.png",
+    "category": "личное",
+    "tags": [
+      "первое",
+      "фото",
+      "личное"
+    ],
+    "likes": 5,
+    "isLiked": false,
+    "isFavorite": true,
+    "views": 23,
+    "comments": [
+      {
+        "id": 1,
+        "user": "Я",
+        "text": "Отличное фото!",
+        "date": "2024-01-15"
+      }
+    ],
+    "uploadDate": "2024-01-15"
+  },
+  {
+    "id": 2,
+    "title": "Отдых на природе",
+    "description": "Выходные на свежем воздухе",
+    "filename": "nature.png",
+    "category": "природа",
+    "tags": [
+      "природа",
+      "отдых",
+      "пикник"
+    ],
+    "likes": 12,
+    "isLiked": true,
+    "isFavorite": false,
+    "views": 46,
+    "comments": [
+      {
+        "id": 1,
+        "user": "Друг",
+        "text": "Красивое место!",
+        "date": "2024-01-16"
+      }
+    ],
+    "uploadDate": "2024-01-16"
+  },
+  {
+    "id": 3,
+    "title": "Город ночью",
+    "description": "Ночная прогулка по городу",
+    "filename": "city.png",
+    "category": "город",
+    "tags": [
+      "город",
+      "ночь",
+      "прогулка"
+    ],
+    "likes": 8,
+    "isLiked": false,
+    "isFavorite": true,
+    "views": 31,
+    "comments": [],
+    "uploadDate": "2024-01-17"
+  },
+  {
+    "id": 4,
+    "title": "Морской пейзаж",
+    "description": "Отдых у моря",
+    "filename": "sea.png",
+    "category": "море",
+    "tags": [
+      "море",
+      "пляж",
+      "отпуск"
+    ],
+    "likes": 15,
+    "isLiked": true,
+    "isFavorite": true,
+    "views": 52,
+    "comments": [
+      {
+        "id": 1,
+        "user": "Семья",
+        "text": "Прекрасный вид!",
+        "date": "2024-01-18"
+      },
+      {
+        "id": 2,
+        "user": "Я",
+        "text": "Лучший отпуск!",
+        "date": "2024-01-18"
+      }
+    ],
+    "uploadDate": "2024-01-18"
+  },
+  {
+    "id": 5,
+    "title": "Зимняя сказка",
+    "description": "Первый снег этого года",
+    "filename": "winter.png",
+    "category": "зима",
+    "tags": [
+      "зима",
+      "снег",
+      "мороз"
+    ],
+    "likes": 7,
+    "isLiked": false,
+    "isFavorite": false,
+    "views": 28,
+    "comments": [],
+    "uploadDate": "2024-01-19"
+  }
+]

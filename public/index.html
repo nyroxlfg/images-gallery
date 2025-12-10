@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📸 Моя фотогалерея</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                <h1>Моя фотогалерея</h1>
+            </div>
+            <div class="stats">
+                <span class="stat">
+                    <i class="fas fa-images"></i>
+                    <span id="totalImages">0</span>
+                </span>
+                <span class="stat">
+                    <i class="fas fa-heart"></i>
+                    <span id="totalLikes">0</span>
+                </span>
+                <span class="stat">
+                    <i class="fas fa-star"></i>
+                    <span id="favoritesCount">0</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <main>
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск фото...">
+                <button onclick="searchImages()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <div class="filters">
+                <select id="categoryFilter">
+                    <option value="all">Все категории</option>
+                </select>
+                
+                <select id="sortFilter" onchange="loadImages()">
+                    <option value="newest">Сначала новые</option>
+                    <option value="likes">По лайкам</option>
+                    <option value="views">По просмотрам</option>
+                </select>
+                
+                <button class="btn" onclick="showFavorites()">
+                    <i class="fas fa-star"></i> Избранное
+                </button>
+            </div>
+        </div>
+
+        <!-- Галерея -->
+        <div class="gallery" id="gallery">
+            <!-- Фотографии загрузятся здесь -->
+        </div>
+    </main>
+
+    <!-- Модальное окно -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
